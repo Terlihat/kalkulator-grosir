@@ -3,30 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator Modal Grosir</title>
+    <title>Kalkulator Modal & Harga Jual Grosir</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <style>
         :root {
-            /* Light Theme Variables */
             --bg-color: #f3f4f6;
             --card-bg: #ffffff;
             --text-main: #1f2937;
             --text-muted: #6b7280;
             --primary: #3b82f6;
             --primary-hover: #2563eb;
+            --success: #10b981;
+            --success-hover: #059669;
             --danger: #ef4444;
             --border-color: #e5e7eb;
             --input-bg: #f9fafb;
         }
 
         [data-theme="dark"] {
-            /* Dark Theme Variables */
             --bg-color: #111827;
             --card-bg: #1f2937;
             --text-main: #f9fafb;
             --text-muted: #9ca3af;
             --primary: #3b82f6;
             --primary-hover: #60a5fa;
+            --success: #34d399;
+            --success-hover: #10b981;
             --danger: #f87171;
             --border-color: #374151;
             --input-bg: #111827;
@@ -44,12 +46,12 @@
             background-color: var(--bg-color);
             color: var(--text-main);
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            align-items: center;
             padding: 2rem;
             min-height: 100vh;
         }
 
-        /* Dioptimalkan untuk Tablet 11 Inci */
         .container {
             background-color: var(--card-bg);
             width: 100%;
@@ -59,7 +61,8 @@
             padding: 2.5rem;
             display: flex;
             flex-direction: column;
-            gap: 2rem;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
         }
 
         .header {
@@ -70,11 +73,6 @@
             padding-bottom: 1.5rem;
         }
 
-        .header h1 {
-            font-size: 1.8rem;
-            color: var(--text-main);
-        }
-
         .theme-toggle {
             background: var(--input-bg);
             border: 1px solid var(--border-color);
@@ -83,18 +81,25 @@
             border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 1rem;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
         }
 
         .form-group {
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
+            flex: 1;
+            min-width: 250px;
         }
 
         label {
             font-weight: 600;
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
 
         input {
@@ -113,7 +118,6 @@
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
         }
 
-        /* Konfigurasi Multiplier / Satuan Dinamis */
         .multipliers-section {
             background-color: var(--bg-color);
             padding: 1.5rem;
@@ -121,20 +125,11 @@
             border: 1px solid var(--border-color);
         }
 
-        .multipliers-section h3 {
-            margin-bottom: 1rem;
-            font-size: 1.2rem;
-        }
-
         .multiplier-row {
             display: flex;
             gap: 1rem;
             margin-bottom: 1rem;
             align-items: center;
-        }
-
-        .multiplier-row input {
-            flex: 1;
         }
 
         .btn {
@@ -152,11 +147,6 @@
             color: var(--primary);
             border: 2px dashed var(--primary);
             width: 100%;
-            margin-top: 0.5rem;
-        }
-
-        .btn-add:hover {
-            background-color: rgba(59, 130, 246, 0.1);
         }
 
         .btn-remove {
@@ -169,43 +159,99 @@
             background-color: var(--primary);
             color: white;
             font-size: 1.25rem;
-            margin-top: 1rem;
         }
 
-        .btn-calculate:hover {
-            background-color: var(--primary-hover);
-        }
-
-        /* Hasil */
+        /* Result Section */
         .result-box {
             background-color: var(--input-bg);
             border: 2px solid var(--primary);
             border-radius: 12px;
-            padding: 2rem;
+            padding: 1.5rem;
             text-align: center;
-            display: none; /* Disembunyikan sampai ada hasil */
+            display: none;
         }
-
+        
         .result-box.active {
             display: block;
         }
 
-        .result-box h2 {
-            font-size: 1.5rem;
-            color: var(--text-muted);
-            margin-bottom: 0.5rem;
+        .result-grid {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
-        .result-box .price {
-            font-size: 2.5rem;
+        .price-item h3 {
+            font-size: 1rem;
+            color: var(--text-muted);
+        }
+
+        .price-item .price {
+            font-size: 2rem;
             font-weight: bold;
             color: var(--primary);
         }
 
-        .calculation-path {
-            margin-top: 1rem;
+        .price-item .price.sell {
+            color: var(--success);
+        }
+
+        /* History Section */
+        .history-container {
+            width: 100%;
+            max-width: 800px;
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-export {
+            background-color: var(--success);
+            color: white;
+            padding: 0.75rem 1rem;
             font-size: 1rem;
-            color: var(--text-muted);
+        }
+
+        .btn-clear {
+            background-color: transparent;
+            color: var(--danger);
+            border: 1px solid var(--danger);
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .history-card {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-details p {
+            margin-bottom: 0.25rem;
+        }
+
+        .history-prices {
+            text-align: right;
         }
     </style>
 </head>
@@ -213,26 +259,23 @@
 
     <div class="container">
         <div class="header">
-            <h1>Kalkulator Modal Grosir</h1>
-            <button class="theme-toggle" onclick="toggleTheme()">🌓 Mode Gelap</button>
+            <h2>Kalkulator Grosir Pro</h2>
+            <button class="theme-toggle" onclick="toggleTheme()">🌓 Tema</button>
         </div>
 
-        <div class="form-group">
-            <label for="itemName">Nama Barang (Opsional)</label>
-            <input type="text" id="itemName" placeholder="Contoh: Teh Sisri">
-        </div>
-
-        <div class="form-group">
-            <label for="totalPrice">Harga Total Pembelian (Rp)</label>
-            <input type="number" id="totalPrice" placeholder="Contoh: 46000" min="0">
+        <div class="form-row">
+            <div class="form-group">
+                <label>Nama Barang</label>
+                <input type="text" id="itemName" placeholder="Contoh: Teh Sisri">
+            </div>
+            <div class="form-group">
+                <label>Harga Total Pembelian (Rp)</label>
+                <input type="number" id="totalPrice" placeholder="Contoh: 46000" min="0">
+            </div>
         </div>
 
         <div class="multipliers-section">
-            <h3>Rincian Isi Kemasan</h3>
-            <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.95rem;">
-                Masukkan jumlah dan nama sebutan (contoh: 12 Renceng, 10 Sachet). Tambahkan baris jika isi lebih bertingkat.
-            </p>
-            
+            <h3 style="margin-bottom: 1rem;">Rincian Isi Kemasan</h3>
             <div id="multiplierContainer">
                 <div class="multiplier-row">
                     <input type="number" class="qty-input" placeholder="Jumlah (Misal: 12)" min="1">
@@ -244,25 +287,49 @@
                     <button class="btn btn-remove" onclick="removeRow(this)">X</button>
                 </div>
             </div>
-
             <button class="btn btn-add" onclick="addRow()">+ Tambah Rincian Isi</button>
         </div>
 
-        <button class="btn btn-calculate" onclick="calculateCost()">Hitung Harga Modal</button>
+        <div class="form-group">
+            <label>Target Keuntungan (%) - Opsional</label>
+            <input type="number" id="marginProfit" placeholder="Contoh: 20 (Untuk untung 20%)" min="0" value="0">
+        </div>
+
+        <button class="btn btn-calculate" onclick="calculateCost()">Hitung & Simpan</button>
 
         <div id="resultBox" class="result-box">
-            <h2 id="resultTitle">Harga Modal per Sachet</h2>
-            <div class="price" id="resultPrice">Rp 0</div>
-            <div class="calculation-path" id="resultPath">Total isi: 120 (12 Renceng x 10 Sachet)</div>
+            <h2 id="resultTitle">Hasil Perhitungan</h2>
+            <p id="resultPath" style="color: var(--text-muted); margin-top: 0.5rem;"></p>
+            <div class="result-grid">
+                <div class="price-item">
+                    <h3>Harga Modal / Satuan</h3>
+                    <div class="price" id="resultModal">Rp 0</div>
+                </div>
+                <div class="price-item">
+                    <h3>Saran Harga Jual</h3>
+                    <div class="price sell" id="resultJual">Rp 0</div>
+                </div>
+            </div>
         </div>
     </div>
 
+    <div class="history-container">
+        <div class="history-header">
+            <h3>Riwayat Pencatatan</h3>
+            <div style="display: flex; gap: 0.5rem;">
+                <button class="btn btn-clear" onclick="clearHistory()">Hapus Semua</button>
+                <button class="btn btn-export" onclick="exportToCSV()">📥 Ekspor Excel (CSV)</button>
+            </div>
+        </div>
+        <div class="history-list" id="historyList">
+            </div>
+    </div>
+
     <script>
-        // Mengelola Mode Gelap/Terang
+        // Manajemen Tema
         function toggleTheme() {
             const html = document.documentElement;
-            const currentTheme = html.getAttribute('data-theme');
-            if (currentTheme === 'dark') {
+            if (html.getAttribute('data-theme') === 'dark') {
                 html.removeAttribute('data-theme');
                 localStorage.setItem('theme', 'light');
             } else {
@@ -270,13 +337,11 @@
                 localStorage.setItem('theme', 'dark');
             }
         }
-
-        // Cek preferensi tema sebelumnya
         if (localStorage.getItem('theme') === 'dark') {
             document.documentElement.setAttribute('data-theme', 'dark');
         }
 
-        // Menambahkan baris input baru
+        // Manajemen Baris Kemasan
         function addRow() {
             const container = document.getElementById('multiplierContainer');
             const row = document.createElement('div');
@@ -289,66 +354,150 @@
             container.appendChild(row);
         }
 
-        // Menghapus baris input
         function removeRow(btn) {
             btn.parentElement.remove();
         }
 
-        // Format angka ke Rupiah
+        // Format Rupiah
         function formatRupiah(number) {
             return new Intl.NumberFormat('id-ID', {
-                style: 'currency',
-                currency: 'IDR',
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 2 // Menampilkan maksimal 2 angka desimal jika ada koma
+                style: 'currency', currency: 'IDR', minimumFractionDigits: 0
             }).format(number);
         }
 
-        // Logika Utama Perhitungan
+        // --- LOGIKA UTAMA & PENYIMPANAN ---
+        let historyData = JSON.parse(localStorage.getItem('grosirData')) || [];
+
         function calculateCost() {
+            const itemName = document.getElementById('itemName').value || "Barang Tanpa Nama";
             const totalPrice = parseFloat(document.getElementById('totalPrice').value);
-            const itemName = document.getElementById('itemName').value || "Barang";
+            const margin = parseFloat(document.getElementById('marginProfit').value) || 0;
             
             if (!totalPrice || isNaN(totalPrice)) {
-                alert("Mohon masukkan Harga Total Pembelian yang valid.");
+                alert("Masukkan Harga Total Pembelian yang valid.");
                 return;
             }
 
             const rows = document.querySelectorAll('.multiplier-row');
             let totalQty = 1;
             let pathTexts = [];
-            let lastUnit = "Pcs"; // Default satuan akhir
+            let lastUnit = "Pcs";
 
             rows.forEach(row => {
                 const qty = parseFloat(row.querySelector('.qty-input').value);
-                const unit = row.querySelector('.unit-input').value || "Satuan";
-
-                if (qty && !isNaN(qty)) {
+                const unit = row.querySelector('.unit-input').value || "Unit";
+                if (qty) {
                     totalQty *= qty;
                     pathTexts.push(`${qty} ${unit}`);
-                    lastUnit = unit; // Mengambil sebutan terakhir sebagai satuan terkecil
+                    lastUnit = unit;
                 }
             });
 
-            if (totalQty === 1 && pathTexts.length === 0) {
-                alert("Mohon masukkan minimal 1 rincian isi kemasan.");
+            if (pathTexts.length === 0) {
+                alert("Masukkan minimal 1 rincian isi kemasan.");
                 return;
             }
 
-            // Hitung harga satuan
+            // Perhitungan Modal & Jual
             const unitPrice = totalPrice / totalQty;
+            const sellingPrice = unitPrice + (unitPrice * (margin / 100));
 
             // Tampilkan Hasil
-            const resultBox = document.getElementById('resultBox');
-            document.getElementById('resultTitle').innerText = `Harga Modal per ${lastUnit} (${itemName})`;
-            document.getElementById('resultPrice').innerText = formatRupiah(unitPrice);
+            document.getElementById('resultTitle').innerText = `${itemName} (per ${lastUnit})`;
             document.getElementById('resultPath').innerText = `Total isi: ${totalQty} (${pathTexts.join(' x ')})`;
+            document.getElementById('resultModal').innerText = formatRupiah(unitPrice);
+            document.getElementById('resultJual').innerText = formatRupiah(sellingPrice);
+            document.getElementById('resultBox').classList.add('active');
+
+            // Simpan ke Riwayat
+            const record = {
+                id: Date.now(),
+                date: new Date().toLocaleString('id-ID'),
+                name: itemName,
+                path: `${totalQty} (${pathTexts.join('x')})`,
+                totalPrice: totalPrice,
+                modal: unitPrice,
+                jual: sellingPrice,
+                margin: margin
+            };
             
-            resultBox.classList.add('active');
+            historyData.unshift(record); // Tambah di paling atas
+            localStorage.setItem('grosirData', JSON.stringify(historyData));
             
-            // Scroll ke hasil (Berguna di tablet)
-            resultBox.scrollIntoView({ behavior: "smooth" });
+            renderHistory();
+            
+            // Bersihkan input nama barang & harga total untuk barang berikutnya
+            document.getElementById('itemName').value = '';
+            document.getElementById('totalPrice').value = '';
+            document.getElementById('itemName').focus();
         }
+
+        // Tampilkan Riwayat
+        function renderHistory() {
+            const container = document.getElementById('historyList');
+            container.innerHTML = '';
+            
+            if(historyData.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:var(--text-muted);">Belum ada riwayat pencatatan.</p>';
+                return;
+            }
+
+            historyData.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'history-card';
+                card.innerHTML = `
+                    <div class="history-details">
+                        <strong style="font-size:1.1rem; color:var(--primary);">${item.name}</strong>
+                        <p style="font-size:0.9rem; color:var(--text-muted);">${item.date}</p>
+                        <p style="font-size:0.9rem;">Total Beli: ${formatRupiah(item.totalPrice)} | Isi: ${item.path}</p>
+                    </div>
+                    <div class="history-prices">
+                        <p>Modal: <strong>${formatRupiah(item.modal)}</strong></p>
+                        <p style="color:var(--success);">Jual (${item.margin}%): <strong>${formatRupiah(item.jual)}</strong></p>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Hapus Riwayat
+        function clearHistory() {
+            if(confirm("Anda yakin ingin menghapus semua riwayat pencatatan?")) {
+                historyData = [];
+                localStorage.removeItem('grosirData');
+                renderHistory();
+            }
+        }
+
+        // Ekspor ke CSV untuk Excel
+        function exportToCSV() {
+            if(historyData.length === 0) {
+                alert("Tidak ada data untuk diekspor.");
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            // Header
+            csvContent += "Tanggal,Nama Barang,Harga Beli Total,Rincian Isi,Harga Modal Satuan,Margin (%),Harga Jual Satuan\r\n";
+            
+            // Data Rows
+            historyData.forEach(row => {
+                let rowData = `"${row.date}","${row.name}","${row.totalPrice}","${row.path}","${row.modal}","${row.margin}%","${row.jual}"`;
+                csvContent += rowData + "\r\n";
+            });
+
+            // Eksekusi Unduhan
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "Rekap_Barang_Grosir.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Render saat halaman pertama dimuat
+        renderHistory();
     </script>
 </body>
 </html>
