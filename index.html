@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Modal Grosir</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <style>
+        :root {
+            /* Light Theme Variables */
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --danger: #ef4444;
+            --border-color: #e5e7eb;
+            --input-bg: #f9fafb;
+        }
+
+        [data-theme="dark"] {
+            /* Dark Theme Variables */
+            --bg-color: #111827;
+            --card-bg: #1f2937;
+            --text-main: #f9fafb;
+            --text-muted: #9ca3af;
+            --primary: #3b82f6;
+            --primary-hover: #60a5fa;
+            --danger: #f87171;
+            --border-color: #374151;
+            --input-bg: #111827;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        /* Dioptimalkan untuk Tablet 11 Inci */
+        .container {
+            background-color: var(--card-bg);
+            width: 100%;
+            max-width: 800px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 1.5rem;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            color: var(--text-main);
+        }
+
+        .theme-toggle {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--input-bg);
+            color: var(--text-main);
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        /* Konfigurasi Multiplier / Satuan Dinamis */
+        .multipliers-section {
+            background-color: var(--bg-color);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .multipliers-section h3 {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .multiplier-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+
+        .multiplier-row input {
+            flex: 1;
+        }
+
+        .btn {
+            padding: 1rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .btn-add {
+            background-color: transparent;
+            color: var(--primary);
+            border: 2px dashed var(--primary);
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        .btn-add:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+
+        .btn-remove {
+            background-color: var(--danger);
+            color: white;
+            padding: 1rem;
+        }
+
+        .btn-calculate {
+            background-color: var(--primary);
+            color: white;
+            font-size: 1.25rem;
+            margin-top: 1rem;
+        }
+
+        .btn-calculate:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* Hasil */
+        .result-box {
+            background-color: var(--input-bg);
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            display: none; /* Disembunyikan sampai ada hasil */
+        }
+
+        .result-box.active {
+            display: block;
+        }
+
+        .result-box h2 {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .result-box .price {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .calculation-path {
+            margin-top: 1rem;
+            font-size: 1rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Kalkulator Modal Grosir</h1>
+            <button class="theme-toggle" onclick="toggleTheme()">🌓 Mode Gelap</button>
+        </div>
+
+        <div class="form-group">
+            <label for="itemName">Nama Barang (Opsional)</label>
+            <input type="text" id="itemName" placeholder="Contoh: Teh Sisri">
+        </div>
+
+        <div class="form-group">
+            <label for="totalPrice">Harga Total Pembelian (Rp)</label>
+            <input type="number" id="totalPrice" placeholder="Contoh: 46000" min="0">
+        </div>
+
+        <div class="multipliers-section">
+            <h3>Rincian Isi Kemasan</h3>
+            <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.95rem;">
+                Masukkan jumlah dan nama sebutan (contoh: 12 Renceng, 10 Sachet). Tambahkan baris jika isi lebih bertingkat.
+            </p>
+            
+            <div id="multiplierContainer">
+                <div class="multiplier-row">
+                    <input type="number" class="qty-input" placeholder="Jumlah (Misal: 12)" min="1">
+                    <input type="text" class="unit-input" placeholder="Sebutan (Misal: Renceng)">
+                </div>
+                <div class="multiplier-row">
+                    <input type="number" class="qty-input" placeholder="Jumlah (Misal: 10)" min="1">
+                    <input type="text" class="unit-input" placeholder="Sebutan (Misal: Sachet)">
+                    <button class="btn btn-remove" onclick="removeRow(this)">X</button>
+                </div>
+            </div>
+
+            <button class="btn btn-add" onclick="addRow()">+ Tambah Rincian Isi</button>
+        </div>
+
+        <button class="btn btn-calculate" onclick="calculateCost()">Hitung Harga Modal</button>
+
+        <div id="resultBox" class="result-box">
+            <h2 id="resultTitle">Harga Modal per Sachet</h2>
+            <div class="price" id="resultPrice">Rp 0</div>
+            <div class="calculation-path" id="resultPath">Total isi: 120 (12 Renceng x 10 Sachet)</div>
+        </div>
+    </div>
+
+    <script>
+        // Mengelola Mode Gelap/Terang
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            if (currentTheme === 'dark') {
+                html.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Cek preferensi tema sebelumnya
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+
+        // Menambahkan baris input baru
+        function addRow() {
+            const container = document.getElementById('multiplierContainer');
+            const row = document.createElement('div');
+            row.className = 'multiplier-row';
+            row.innerHTML = `
+                <input type="number" class="qty-input" placeholder="Jumlah" min="1">
+                <input type="text" class="unit-input" placeholder="Sebutan">
+                <button class="btn btn-remove" onclick="removeRow(this)">X</button>
+            `;
+            container.appendChild(row);
+        }
+
+        // Menghapus baris input
+        function removeRow(btn) {
+            btn.parentElement.remove();
+        }
+
+        // Format angka ke Rupiah
+        function formatRupiah(number) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2 // Menampilkan maksimal 2 angka desimal jika ada koma
+            }).format(number);
+        }
+
+        // Logika Utama Perhitungan
+        function calculateCost() {
+            const totalPrice = parseFloat(document.getElementById('totalPrice').value);
+            const itemName = document.getElementById('itemName').value || "Barang";
+            
+            if (!totalPrice || isNaN(totalPrice)) {
+                alert("Mohon masukkan Harga Total Pembelian yang valid.");
+                return;
+            }
+
+            const rows = document.querySelectorAll('.multiplier-row');
+            let totalQty = 1;
+            let pathTexts = [];
+            let lastUnit = "Pcs"; // Default satuan akhir
+
+            rows.forEach(row => {
+                const qty = parseFloat(row.querySelector('.qty-input').value);
+                const unit = row.querySelector('.unit-input').value || "Satuan";
+
+                if (qty && !isNaN(qty)) {
+                    totalQty *= qty;
+                    pathTexts.push(`${qty} ${unit}`);
+                    lastUnit = unit; // Mengambil sebutan terakhir sebagai satuan terkecil
+                }
+            });
+
+            if (totalQty === 1 && pathTexts.length === 0) {
+                alert("Mohon masukkan minimal 1 rincian isi kemasan.");
+                return;
+            }
+
+            // Hitung harga satuan
+            const unitPrice = totalPrice / totalQty;
+
+            // Tampilkan Hasil
+            const resultBox = document.getElementById('resultBox');
+            document.getElementById('resultTitle').innerText = `Harga Modal per ${lastUnit} (${itemName})`;
+            document.getElementById('resultPrice').innerText = formatRupiah(unitPrice);
+            document.getElementById('resultPath').innerText = `Total isi: ${totalQty} (${pathTexts.join(' x ')})`;
+            
+            resultBox.classList.add('active');
+            
+            // Scroll ke hasil (Berguna di tablet)
+            resultBox.scrollIntoView({ behavior: "smooth" });
+        }
+    </script>
+</body>
+</html>
